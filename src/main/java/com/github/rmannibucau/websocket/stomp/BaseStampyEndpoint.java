@@ -12,10 +12,14 @@ import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 // easier to inherit than annotated version which is more application oriented
 // than library oriented
 public abstract class BaseStampyEndpoint extends Endpoint {
+    private final Logger logger = Logger.getLogger(getClass().getName());
+
     protected final WebSocketGateway gateway;
     private final StompMessageParser parser = new StompMessageParser();
     private final StampyHandlerHelper helper = new StampyHandlerHelper();
@@ -52,6 +56,12 @@ public abstract class BaseStampyEndpoint extends Endpoint {
         });
     }
 
+    @Override
+    public void onError(final Session session, final Throwable throwable) {
+        logger.log(Level.SEVERE, throwable == null ? null : throwable.getMessage(), throwable);
+    }
+
+    @Override
     public void onClose(final Session session, final CloseReason closeReason) {
         gateway.close(session);
     }
